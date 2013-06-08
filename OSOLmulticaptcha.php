@@ -24,7 +24,7 @@ $captcha->displayCaptcha();*/
 class OSOLmulticaptcha{
 	
 	var $imageFunction = "Adv";
-	var $font_size = 24;
+	var $font_size = 36;
 	var $font_ttf  = 'AdLibBT.TTF';
 	var $bgColor = "#ffffff";
 	var $textColor = "#00ffff";
@@ -119,11 +119,11 @@ class OSOLmulticaptcha{
 								'font_size' => $font_size,
 								);
 		$fontMetaFile = $this->fontPNGLocation.$this->DS.$this->fontMetaFile;
-		if(unserialize( file_get_contents($fontMetaFile)) ==$fontFileMeta)
+		if(unserialize( file_get_contents($fontMetaFile)) == $fontFileMeta)
 		{
 			return;
 		}
-		
+		//die("Saved one <pre>".print_r(unserialize( file_get_contents($fontMetaFile)),true)."</pre><hr />Required one <pre>".print_r($fontFileMeta,true)."</pre>");
 		file_put_contents ( $fontMetaFile,serialize($fontFileMeta));
 		$the_box        = $this->calculateTextBox($text_string, $font_ttf, $font_size, $text_angle);
 		

@@ -90,54 +90,6 @@
 </ul>
 <ul>
   <li>
-    <label id="jform_params_allowedSymbols-lbl" for="jform_params_allowedSymbols" title="">Allowed Symbols</label>
-    <input name="jform[params][allowedSymbols]" id="jform_params_allowedSymbols" value="ABCDEFGHJKLMNPQRTWXY346789" size="50" type="text" />
-  </li>
-</ul>
-<ul>
-  <li>
-    <label id="jform_params_imageFunction-lbl" for="jform_params_imageFunction" title="">Select Image Function</label>
-    <select name="jform[params][imageFunction]" id="jform_params_imageFunction" class="" aria-invalid="false">
-	<option value="Plane">Plane letters</option>
-	<option selected="selected" value="Adv">Distorted letters</option>
-</select>
-  </li>
-</ul>
-<ul>
-  <li>
-    <label id="jform_params_fontFile-lbl" for="jform_params_fontFile" title="">Select font</label>
-    <select id="jform_params_fontFile" name="jform[params][fontFile]" class="" aria-invalid="false">
-		<?php
-		    $defaultFont = 'BookmanOldStyle.TTF';
-			$ttfPath =dirname(__FILE__)."/utils/ttfs"."/";
-			$ttfsAvailable = "";
-			if ($handle = opendir($ttfPath)) {
-				
-			
-				
-				while (false !== ($entry = readdir($handle))) {
-					if(preg_match("@.*\.(ttf|otf)@i",$entry))
-					{
-						$selected = "";
-						if($defaultFont == $entry)
-						{
-							$selected = " selected=\"selected\"";
-						}
-						echo "<option value=\"".$entry."\" $selected>".$entry."</option>\n";	
-					}
-				}
-			
-				
-			
-				closedir($handle);
-			}
-		?>
-	
-		</select>
-  </li>
-</ul>
-<ul>
-  <li>
     <label id="jform_params_white_noise_density-lbl" for="jform_params_white_noise_density" title="">Noise in BG color</label>
     <select name="jform[params][white_noise_density]" id="jform_params_white_noise_density">
 	<option selected="selected" value="0">0</option>
@@ -158,6 +110,57 @@
 </select>
   </li>
 </ul>
+<?php
+		    $defaultFont = 'AdLibBT.TTF';
+			$ttfPath =dirname(__FILE__)."/utils/ttfs"."/";
+			$ttfsAvailable = "";
+			if ($handle = opendir($ttfPath)) {
+				
+			
+				
+				while (false !== ($entry = readdir($handle))) {
+					if(preg_match("@.*\.(ttf|otf)@i",$entry))
+					{
+						$selected = "";
+						if($defaultFont == $entry)
+						{
+							$selected = " selected=\"selected\"";
+						}
+						$ttfsAvailable .=  "<option value=\"".$entry."\" $selected>".$entry."</option>\n";	
+					}
+				}
+			
+				
+			
+				closedir($handle);
+			}
+			if($ttfsAvailable != ''){
+		?>
+<ul>
+  <li>
+    <label id="jform_params_allowedSymbols-lbl" for="jform_params_allowedSymbols" title="">Allowed Symbols</label>
+    <input name="jform[params][allowedSymbols]" id="jform_params_allowedSymbols" value="ABCDEFGHJKLMNPQRTWXY346789" size="50" type="text" />
+  </li>
+</ul>
+<ul>
+  <li>
+    <label id="jform_params_imageFunction-lbl" for="jform_params_imageFunction" title="">Select Letter Type</label>
+    <select name="jform[params][imageFunction]" id="jform_params_imageFunction" class="" aria-invalid="false">
+	<option value="Plane">Plane letters</option>
+	<option selected="selected" value="Adv">Distorted letters</option>
+</select>
+  </li>
+</ul>
+
+<ul>
+  <li>
+    <label id="jform_params_fontFile-lbl" for="jform_params_fontFile" title="">Select font</label>
+    <select id="jform_params_fontFile" name="jform[params][fontFile]" class="" aria-invalid="false">
+		
+  <?php echo $ttfsAvailable;?>
+	</select>
+  </li>
+</ul>
 <ul>
   <li>
     <label id="jform_params_letterSize-lbl" for="jform_params_letterSize" title="">Select letter size</label>
@@ -169,6 +172,33 @@
 </select>
   </li>
 </ul>
+<?php }
+else
+{
+	
+	?>
+    <ul>
+        <li>
+       <h1> To use more options, save required fonts(.TTF/.OTF)s in the folder utils/ttfs</h1>
+        Adanced options available with ttfs are 
+        <ol>
+            <li>Letter Type (Plane or distorted)</li>
+            <li>Allowed symbols</li>
+            <li>Font</li>
+            <li>Letter size</li>
+        </ol>
+        <input type="hidden" id="jform_params_imageFunction" name="jform[params][imageFunction]" value="Adv" />
+        <input type="hidden" id="jform_params_allowedSymbols" name="jform[params][allowedSymbols]" value="ABCDEFGHJKLMNPQRTWXY346789" />
+        <input type="hidden" id="jform_params_fontFile"  name="jform[params][fontFile]" value="<?php echo $defaultFont;?>" />
+        <input type="hidden" id="jform_params_letterSize"  name="jform[params][letterSize]" value="36" />
+       </li>
+      </ul>
+    
+    <?php
+}
+?>
+
+
 <ul>
   <li>
     <label id="jform_params__-lbl" for="jform_params__">Preview Captcha</label>
