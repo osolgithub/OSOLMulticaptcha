@@ -26,10 +26,10 @@ class OSOLmulticaptcha{
 	var $imageFunction = "Adv";
 	var $font_size = 36;
 	var $font_ttf  = 'AdLibBT.TTF';
-	var $bgColor = "#ffffff";
-	var $textColor = "#00ffff";
+	var $bgColor = "#2c8007";
+	var $textColor = "#ffffff";
 	
-	var $symbolsToUse = "234789acdeghklmnpqrwxyz";//"ABCDEFGHJKLMNPQRSTWXYZ23456789";
+	var $symbolsToUse = "ABCDEFGHJKLMNPQRTWXY346789";//"234789acdeghklmnpqrwxyz";
 	var $fluctuation_amplitude = 4;
 	var $white_noise_density = 0;
 	var $black_noise_density = 0;

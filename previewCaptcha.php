@@ -1,3 +1,8 @@
+<?php
+require_once('OSOLmulticaptcha.php');
+$captcha = new OSOLmulticaptcha();
+//$captcha->displayCaptcha();
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -111,7 +116,7 @@
   </li>
 </ul>
 <?php
-		    $defaultFont = 'AdLibBT.TTF';
+		    $defaultFont = $captcha->font_ttf;//'AdLibBT.TTF';
 			$ttfPath =dirname(__FILE__)."/utils/ttfs"."/";
 			$ttfsAvailable = "";
 			if ($handle = opendir($ttfPath)) {
@@ -139,7 +144,7 @@
 <ul>
   <li>
     <label id="jform_params_allowedSymbols-lbl" for="jform_params_allowedSymbols" title="">Allowed Symbols</label>
-    <input name="jform[params][allowedSymbols]" id="jform_params_allowedSymbols" value="ABCDEFGHJKLMNPQRTWXY346789" size="50" type="text" />
+    <input name="jform[params][allowedSymbols]" id="jform_params_allowedSymbols" value="<?php echo $captcha->symbolsToUse;?>" size="50" type="text" />
   </li>
 </ul>
 <ul>
@@ -187,10 +192,10 @@ else
             <li>Font</li>
             <li>Letter size</li>
         </ol>
-        <input type="hidden" id="jform_params_imageFunction" name="jform[params][imageFunction]" value="Adv" />
-        <input type="hidden" id="jform_params_allowedSymbols" name="jform[params][allowedSymbols]" value="ABCDEFGHJKLMNPQRTWXY346789" />
+        <input type="hidden" id="jform_params_imageFunction" name="jform[params][imageFunction]" value="<?php echo $captcha->imageFunction;?>" />
+        <input type="hidden" id="jform_params_allowedSymbols" name="jform[params][allowedSymbols]" value="<?php echo $captcha->symbolsToUse;?>" />
         <input type="hidden" id="jform_params_fontFile"  name="jform[params][fontFile]" value="<?php echo $defaultFont;?>" />
-        <input type="hidden" id="jform_params_letterSize"  name="jform[params][letterSize]" value="36" />
+        <input type="hidden" id="jform_params_letterSize"  name="jform[params][letterSize]" value="<?php echo $captcha->font_ttf;?>" />
        </li>
       </ul>
     
