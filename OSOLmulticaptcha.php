@@ -119,11 +119,32 @@ class OSOLmulticaptcha{
 								'font_size' => $font_size,
 								);
 		$fontMetaFile = $this->fontPNGLocation.$this->DS.$this->fontMetaFile;
-		if(unserialize( file_get_contents($fontMetaFile)) == $fontFileMeta)
+		if(!file_exists($fontMetaFile) )
 		{
-			return;
+			die("missing meta file : ".$fontMetaFile);
+		}
+		
+		$savedfontMeta = unserialize( file_get_contents($fontMetaFile));
+		if(!is_array($savedfontMeta) || !isset($savedfontMeta['alphabet'])  || !isset($savedfontMeta['font_ttf'])  || !isset($savedfontMeta['font_size']))
+		{
+			die("corrupted meta file : ".$fontMetaFile." download the correct one ");
 		}
 		//die("Saved one <pre>".print_r(unserialize( file_get_contents($fontMetaFile)),true)."</pre><hr />Required one <pre>".print_r($fontFileMeta,true)."</pre>");
+		if( $savedfontMeta == $fontFileMeta)
+		{
+			
+			return;
+		}
+		elseif(!(file_exists($font_ttf) || is_dir($font_ttf)))
+		{
+			$alphabet = $this->symbolsToUse = $savedfontMeta['alphabet'];
+			$font_ttf = $this->font_ttf = $savedfontMeta['font_ttf'];
+			$font_size = $this->font_size = $savedfontMeta['font_size'];
+			
+		}
+		
+		
+		
 		file_put_contents ( $fontMetaFile,serialize($fontFileMeta));
 		$the_box        = $this->calculateTextBox($text_string, $font_ttf, $font_size, $text_angle);
 		
@@ -190,6 +211,13 @@ class OSOLmulticaptcha{
 		
 	   // closedir($handle);
 	}
+	function validateFontfile($fontFile)
+	{
+		if(!(file_exists($fontFile) || is_dir($fontFile)))
+		{
+			die("Missing $fontFile.Cant create captcha without it");
+		}
+	}
 		/************
 		simple function that calculates the *exact* bounding box (single pixel precision).
 		The function returns an associative array with these keys:
@@ -198,6 +226,7 @@ class OSOLmulticaptcha{
 		*************/
 	function calculateTextBox($text,$fontFile,$fontSize,$fontAngle) {
 		//die($fontFile);
+		$this->validateFontfile($fontFile);
 		$rect = imagettfbbox($fontSize,$fontAngle,$fontFile,$text);
 		$minX = min(array($rect[0],$rect[2],$rect[4],$rect[6]));
 		$maxX = max(array($rect[0],$rect[2],$rect[4],$rect[6]));
@@ -251,6 +280,7 @@ class OSOLmulticaptcha{
 			$this->createKeyString();
 			$font_file_name = $this->fontPNGFile;
 			$font_file = $this->fontPNGLocation.$this->DS.$font_file_name;
+			$this->validateFontfile($font_file);
 			$font=imagecreatefrompng($font_file);
 			imagealphablending($font, true);
 			$fontfile_width=imagesx($font);
