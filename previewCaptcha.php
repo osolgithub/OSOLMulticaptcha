@@ -195,7 +195,7 @@ else
         <input type="hidden" id="jform_params_imageFunction" name="jform[params][imageFunction]" value="<?php echo $captcha->imageFunction;?>" />
         <input type="hidden" id="jform_params_allowedSymbols" name="jform[params][allowedSymbols]" value="<?php echo $captcha->symbolsToUse;?>" />
         <input type="hidden" id="jform_params_fontFile"  name="jform[params][fontFile]" value="<?php echo $defaultFont;?>" />
-        <input type="hidden" id="jform_params_letterSize"  name="jform[params][letterSize]" value="<?php echo $captcha->font_ttf;?>" />
+        <input type="hidden" id="jform_params_letterSize"  name="jform[params][letterSize]" value="<?php echo $captcha->font_size;?>" />
        </li>
       </ul>
     
