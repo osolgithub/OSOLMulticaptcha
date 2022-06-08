@@ -24,9 +24,9 @@ $captcha->displayCaptcha();*/
 class OSOLmulticaptcha{
 	
 	var $imageFunction = "Adv";
-	var $font_size = 36;
-	var $font_ttf  = 'AdLibBT.TTF';
-	var $bgColor = "#2c8007";
+	var $font_size = 24;
+	var $font_ttf  = 'BookmanOldStyle.TTF';//'AdLibBT.TTF';
+	var $bgColor = "#039be5";//"#2c8007";
 	var $textColor = "#ffffff";
 	
 	var $symbolsToUse = "ABCDEFGHJKLMNPQRTWXY346789";//"234789acdeghklmnpqrwxyz";
@@ -94,7 +94,7 @@ class OSOLmulticaptcha{
 		while(true){
 				$this->keystring='';
 				for($i=0;$i<$this->captchaLength;$i++){
-					$this->keystring.=$allowed_symbols{mt_rand(0,strlen($allowed_symbols)-1)};
+					$this->keystring.=$allowed_symbols[mt_rand(0,strlen($allowed_symbols)-1)];
 				}
 				if(!preg_match('/cp|cb|ck|c6|c9|rn|rm|mm|co|do|cl|db|qp|qb|dp|ww/', $this->keystring)) break;
 			}
@@ -294,13 +294,13 @@ class OSOLmulticaptcha{
 				$transparent = (imagecolorat($font, $i, 0) >> 24) == 127;
 
 				if(!$reading_symbol && !$transparent){
-					$font_metrics[$alphabet{$symbol}]=array('start'=>$i);
+					$font_metrics[$alphabet[$symbol]]=array('start'=>$i);
 					$reading_symbol=true;
 					continue;
 				}
 
 				if($reading_symbol && $transparent){
-					$font_metrics[$alphabet{$symbol}]['end']=$i;
+					$font_metrics[$alphabet[$symbol]]['end']=$i;
 					$reading_symbol=false;
 					$symbol++;
 					continue;
@@ -318,7 +318,7 @@ class OSOLmulticaptcha{
 			// draw text
 			$x=1;
 			for($i=0;$i<$length;$i++){
-				$m=$font_metrics[$this->keystring{$i}];
+				$m=$font_metrics[$this->keystring[$i]];
 
 				$y=mt_rand(-$fluctuation_amplitude, $fluctuation_amplitude)+($height-$fontfile_height)/2+2;
 
