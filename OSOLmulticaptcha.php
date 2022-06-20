@@ -37,6 +37,16 @@ OR
 		
 		echo '<img src="data:image/png;base64,' . $imageContent . '" />';
 		
+		&
+		
+		echo '<img src="data:image/png;base64,' . $imageContent . '" />';
+		
+		& ecrypt
+		
+		$captcha->keystring 
+		
+		and send to html via AJAX
+		
 */
 class OSOLmulticaptcha{
 	
