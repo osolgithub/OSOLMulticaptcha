@@ -23,6 +23,20 @@ session_start();
 $captcha = new OSOLmulticaptcha();
 $captcha->displayCaptcha();
 $_SESSION['OSOLmulticaptcha_keystring'] = $captcha->keystring;
+
+OR
+
+		$returnImgObj = true;
+		$captchaImgObj = $captcha->displayCaptcha($returnImgObj);
+		ob_start();
+		imagepng($captchaImgObj);
+		$imageContent = base64_encode(ob_get_contents());
+		ob_end_clean();
+		
+		&
+		
+		echo '<img src="data:image/png;base64,' . $imageContent . '" />';
+		
 */
 class OSOLmulticaptcha{
 	
