@@ -18,36 +18,56 @@
 # System requirements: PHP 5.3.1 + w/ GD
 # Open  previewCaptcha.php in browser for customization
 /*
+
+For captcha with Cookie
+---------------------------
 //simplest way to show captcha
 session_start();
 $captcha = new OSOLmulticaptcha();
 $captcha->displayCaptcha();
 $_SESSION['OSOLmulticaptcha_keystring'] = $captcha->keystring;
 
-OR
+For captcha without Cookie
+---------------------------
 
+		$captcha = new OSOLmulticaptcha();
+		$captchaEncryptionKey = "SomeRandomKey";// IMPORTANT ****** YOU MUST SET A CUSTOM VALUE FOR YOUR SITE
+		$captcha->setCaptchaEncryptionKey($captchaEncryptionKey);
 		$returnImgObj = true;
 		$captchaImgObj = $captcha->displayCaptcha($returnImgObj);
 		ob_start();
 		imagepng($captchaImgObj);
-		$imageContent = base64_encode(ob_get_contents());
-		ob_end_clean();
+		$imageContent = ob_get_contents();
+		ob_end_clean(); 
+		
+		$var2Display = new stdClass();
+		$var2Display->captchaEncypted = $captcha->getEncryptedCaptchaString();
+		$var2Display->imageContent = base64_encode($imageContent);
+		die(json_encode($var2Display));
+		
 		
 		&
-		
+		The above json variable is received by frontend via AJAX and used to set the following
 		echo '<img src="data:image/png;base64,' . $imageContent . '" />';
+		<input type="hidden" name="captchaEncypted" id="captchaEncypted" value="" >
 		
-		&
 		
-		echo '<img src="data:image/png;base64,' . $imageContent . '" />';
-		
-		& ecrypt
-		
-		$captcha->keystring 
-		
-		and send to html via AJAX
-		
+	To verify Catpcha 
+	-----------------
+	$captcha = new OSOLmulticaptcha();
+	$captchaText2Check = isset($_POST['keystring'])?$_POST['keystring']:"";
+	$encryptedCaptchaString = isset($_POST['captchaEncypted'])?$_POST['captchaEncypted']:"";
+	if(trim($captchaText2Check) != "" && $captcha->isCaptchaCorrect($captchaText2Check, $encryptedCaptchaString))
+	{
+		//chaptcha text entered is correct
+	}
+	else
+	{
+		//chaptcha text entered is not correct
+	}
 */
+#namespace OSOLHelpers;
+#namespace OSOLUtils\Helpers;
 class OSOLmulticaptcha{
 	
 	var $imageFunction = "Adv";
@@ -67,12 +87,17 @@ class OSOLmulticaptcha{
 	var $DS = "/";
 	var $fontPNGLocation = "";
 	var $fontMetaFile = 'fontFileMeta.meta';
+	protected $OSOL_Captcha_CONFIG;
 	
 	
 	
-	function __construct()
+	public function __construct()
 	{
-		
+		$this->OSOL_Captcha_CONFIG = array(
+									'withoutSession' => true,
+									'captchaEncryptionKey' => 'YourUniqueEncryptionKey',
+										
+										);
 		$imageFunction = 'create_image'.((isset($_REQUEST['osolcaptcha_imageFunction']) && $_REQUEST['osolcaptcha_imageFunction'] !='')?$_REQUEST['osolcaptcha_imageFunction']:$this->imageFunction);
 		$this->imageFunction = ((!method_exists($this,$imageFunction)))?'create_imageAdv':$imageFunction;
 		
@@ -102,7 +127,11 @@ class OSOLmulticaptcha{
 
 	
 	}
-	function displayCaptcha($returnImgObj = false)
+	public function setCaptchaEncryptionKey($captchaEncryptionKey = 'YourUniqueEncryptionKey')
+	{
+		$this->OSOL_Captcha_CONFIG['captchaEncryptionKey'] = $captchaEncryptionKey;
+	}
+	public function displayCaptcha($returnImgObj = false)
 	{
 		
 		$imageFunction = $this->imageFunction;
@@ -116,7 +145,16 @@ class OSOLmulticaptcha{
 		else return $this->keystring;
 	}
 	
-	function createKeyString()
+	public function getEncryptedCaptchaString()
+	{
+		return $this->encryptCaptchaString($this->keystring);
+	}
+	public function isCaptchaCorrect($captchaText2Check, $encryptedCaptchaString)
+	{
+		return ($this->decryptCaptchaString($encryptedCaptchaString) == $captchaText2Check);
+	}
+	
+	protected function createKeyString()
 	{
 		$allowed_symbols = $this->symbolsToUse;
 		while(true){
@@ -127,7 +165,7 @@ class OSOLmulticaptcha{
 				if(!preg_match('/cp|cb|ck|c6|c9|rn|rm|mm|co|do|cl|db|qp|qb|dp|ww/', $this->keystring)) break;
 			}
 	}
-	function callCreateAlphaImageForDistorted()
+	protected function callCreateAlphaImageForDistorted()
 	{
 		// Example usage - gif image output
 		$alphabet = $this->symbolsToUse;
@@ -207,7 +245,7 @@ class OSOLmulticaptcha{
 		imagepng($image,$font_file);
 		
 	}
-	function  createAlphaImage()
+	protected function  createAlphaImage()
 	{
 		
 			$font_file = $this->fontPNGLocation.$this->DS.$this->fontPNGFile;
@@ -239,7 +277,7 @@ class OSOLmulticaptcha{
 		
 	   // closedir($handle);
 	}
-	function validateFontfile($fontFile)
+	protected function validateFontfile($fontFile)
 	{
 		if(!(file_exists($fontFile) || is_dir($fontFile)))
 		{
@@ -252,7 +290,7 @@ class OSOLmulticaptcha{
 		left, top:  coordinates you will pass to imagettftext
 		width, height: dimension of the image you have to create
 		*************/
-	function calculateTextBox($text,$fontFile,$fontSize,$fontAngle) {
+	protected function calculateTextBox($text,$fontFile,$fontSize,$fontAngle) {
 		//die($fontFile);
 		$this->validateFontfile($fontFile);
 		$rect = imagettfbbox($fontSize,$fontAngle,$fontFile,$text);
@@ -279,7 +317,7 @@ class OSOLmulticaptcha{
 	
 	# KCAPTCHA is a free software. You can freely use it for building own site or software.
 	# If you use this software as a part of own sofware, you must leave copyright notices intact or add KCAPTCHA copyright notices to own.
-	function create_imageAdv($returnImgObj = false){
+	protected function create_imageAdv($returnImgObj = false){
 		
 		
 		$alphabet = $this->symbolsToUse;
@@ -497,12 +535,12 @@ class OSOLmulticaptcha{
 		
 		
 	}
-	function storeKeyString()
+	protected function storeKeyString()
 	{
 		//$keyStringFile = $this->fontPNGLocation.$this->DS.'keystring.txt';$fp = fopen($keyStringFile,'w');fwrite($fp,$this->keystring);fclose($fp);
 	}
 	// generates plain letters
-	function create_imagePlane()
+	protected function create_imagePlane()
 	{
 
 		$length = 5;
@@ -556,7 +594,7 @@ class OSOLmulticaptcha{
 		
 		$this->storeKeyString();
 	}	
-		function HexToRGB($hex) {
+		protected function HexToRGB($hex) {
 			$hex = preg_replace("/#/", "", $hex);
 			$color = array();
 			
@@ -574,13 +612,64 @@ class OSOLmulticaptcha{
 			return array_values($color);
 		}
 	
-		function RGBToHex($r, $g, $b) {
+		protected function RGBToHex($r, $g, $b) {
 			$hex = "#";
 			$hex.= dechex($r);
 			$hex.= dechex($g);
 			$hex.= dechex($b);
 			
 			return $hex;
+		}
+		protected function encryptCaptchaString($captchaString)
+		{
+			// Store a string into the variable which
+			// need to be Encrypted
+			$simple_string = $captchaString;//"Welcome to GeeksforGeeks\n";
+			  
+			// Display the original string
+			//echo "Original String: " . $simple_string;
+			  
+			// Store the cipher method
+			$ciphering = "AES-128-CTR";
+			  
+			// Use OpenSSl Encryption method
+			$iv_length = openssl_cipher_iv_length($ciphering);
+			$options = 0;
+			  
+			// Non-NULL Initialization Vector for encryption
+			$encryption_iv = '1234567891011121';
+			  
+			// Store the encryption key
+			$encryption_key = $this->OSOL_Captcha_CONFIG['captchaEncryptionKey'];//"GeeksforGeeks";
+			  
+			// Use openssl_encrypt() function to encrypt the data
+			$encryption = openssl_encrypt($simple_string, $ciphering,
+						$encryption_key, $options, $encryption_iv);
+			  
+			// Display the encrypted string
+			//echo "Encrypted String: " . $encryption . "\n";
+			return $encryption;
+		}
+		protected function decryptCaptchaString($captchaString)
+		{
+			$encryption = $captchaString;
+			// Store the cipher method
+			$ciphering = "AES-128-CTR";
+			  
+			// Use OpenSSl Encryption method
+			$iv_length = openssl_cipher_iv_length($ciphering);
+			$options = 0;
+			$encryption = $captchaString;
+			// Non-NULL Initialization Vector for decryption
+			$decryption_iv = '1234567891011121';
+			  
+			// Store the decryption key
+			$decryption_key = $this->OSOL_Captcha_CONFIG['captchaEncryptionKey'];//"GeeksforGeeks";
+			  
+			// Use openssl_decrypt() function to decrypt the data
+			$decryption=openssl_decrypt ($encryption, $ciphering, 
+					$decryption_key, $options, $decryption_iv);
+			return $decryption;
 		}
 }
 ?>
