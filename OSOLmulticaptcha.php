@@ -507,13 +507,13 @@ class OSOLmulticaptcha{
 			}
 		}
 		//die($this->keystring);
-		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); 
-		header('Cache-Control: no-store, no-cache, must-revalidate'); 
-		header('Cache-Control: post-check=0, pre-check=0', FALSE); 
-		header('Pragma: no-cache');
 		if($returnImgObj) return $img2;
 		else
 		{
+			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); 
+			header('Cache-Control: no-store, no-cache, must-revalidate'); 
+			header('Cache-Control: post-check=0, pre-check=0', FALSE); 
+			header('Pragma: no-cache');
 			if(function_exists("imagejpeg")){
 				header("Content-Type: image/jpeg");
 				@imagejpeg($img2, null, $jpeg_quality) or 
@@ -540,7 +540,7 @@ class OSOLmulticaptcha{
 		//$keyStringFile = $this->fontPNGLocation.$this->DS.'keystring.txt';$fp = fopen($keyStringFile,'w');fwrite($fp,$this->keystring);fclose($fp);
 	}
 	// generates plain letters
-	protected function create_imagePlane()
+	protected function create_imagePlane($returnImgObj = false)
 	{
 
 		$length = 5;
@@ -588,11 +588,14 @@ class OSOLmulticaptcha{
 		}
 			$x += ($size *2);
 		}
+		if($returnImgObj) return $image;
+		else
+		{
+			header('Content-type: image/png');
+			imagepng($image);
 		
-		header('Content-type: image/png');
-		imagepng($image);
-		
-		$this->storeKeyString();
+			$this->storeKeyString();
+		}
 	}	
 		protected function HexToRGB($hex) {
 			$hex = preg_replace("/#/", "", $hex);
