@@ -149,9 +149,18 @@ class OSOLmulticaptcha{
 	{
 		return $this->encryptCaptchaString($this->keystring);
 	}
-	public function isCaptchaCorrect($captchaText2Check, $encryptedCaptchaString)
+	public function isCaptchaCorrect($captchaText2Check, $encryptedCaptchaString , $caseInsensitive = false)
 	{
-		return ($this->decryptCaptchaString($encryptedCaptchaString) == $captchaText2Check);
+		$verificationResult = false;		
+		
+		if($caseInsensitive)
+		{
+			return (strtoupper($this->decryptCaptchaString($encryptedCaptchaString)) == strtoupper($captchaText2Check));
+		}
+		else
+		{			
+			return ($this->decryptCaptchaString($encryptedCaptchaString) == $captchaText2Check);
+		}
 	}
 	
 	protected function createKeyString()
